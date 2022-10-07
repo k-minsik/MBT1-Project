@@ -4,6 +4,7 @@ from flask import Flask, jsonify, render_template, Response, request
 import pymysql
 import count
 import sqldef
+from collections import deque
 
 
 conn = pymysql.connect(host='localhost', user='root', password='', db='mbt1', charset='utf8mb4')
@@ -21,8 +22,7 @@ reps_d = 0
 
 def gen_frames(event):
     global reps_s, reps_b, reps_d
-    side = 0
-    status = "start"
+    state = deque(["Up"])
 
     if event == "Squat":
         reps_s = 0
@@ -60,7 +60,7 @@ def gen_frames(event):
             elif event == "Deadlift":
                 cv2.putText(frame, str(reps_d), (int(width-width//4),int(height-height//9)), cv2.FONT_HERSHEY_SIMPLEX, 4, (0,0,0), 4, cv2.LINE_AA)
             
-            cv2.putText(frame, status, (0,int(height//10)), cv2.FONT_HERSHEY_SIMPLEX, 2, (255,255,255), 2, cv2.LINE_AA)
+            cv2.putText(frame, state, (0,int(height//10)), cv2.FONT_HERSHEY_SIMPLEX, 2, (255,255,255), 2, cv2.LINE_AA)
 
             try:
                 landmarks = results.pose_landmarks.landmark
@@ -95,13 +95,13 @@ def gen_frames(event):
 
                 if event == "Squat":
                     #Squat
-                    reps_s, status, side = count.squat(RhipAngle, RkneeAngle, LhipAngle, LkneeAngle, reps_s, status, side)
+                    reps_s, state = count.squat(RhipAngle, RkneeAngle, LhipAngle, LkneeAngle, reps_s, state)
                 elif event == "BenchPress":
                     #BenchPress
-                    reps_b, status, side = count.benchpress(RelbowAngle, LelbowAngle, reps_b, status, side)
+                    reps_b, state= count.benchpress(RelbowAngle, LelbowAngle, reps_b, state)
                 elif event == "Deadlift":
                     #DeadLift
-                    reps_d, status, side = count.deadlift(RhipAngle, RkneeAngle, LhipAngle, LkneeAngle, reps_d, status, side)
+                    reps_d, state = count.deadlift(RhipAngle, RkneeAngle, LhipAngle, LkneeAngle, reps_d, state)
                 
             except:
                 pass

@@ -1,12 +1,11 @@
 import numpy as np
-import sqldef
-import pymysql
+# import sqldef
+# import pymysql
 from collections import deque
 
 
-conn = pymysql.connect(host='localhost', user='root', password='', db='mbt1', charset='utf8mb4')
-cursor = conn.cursor()
-
+# conn = pymysql.connect(host='localhost', user='root', password='', db='mbt1', charset='utf8mb4')
+# cursor = conn.cursor()
 
 
 
@@ -27,26 +26,16 @@ def getAngle(top, mid, bottom):
 def squat(RhipAngle, RkneeAngle, LhipAngle, LkneeAngle, reps, state):
     
     # print(state, RhipAngle, RkneeAngle, LhipAngle, LkneeAngle)
-    if ((RhipAngle > 170)  and (RkneeAngle > 160)):
-        if "UP" not in state and state[0] == "SQUAT":
+    if ((RhipAngle > 170)  and (RkneeAngle > 160)) or ((LhipAngle > 170)  and (LkneeAngle > 160)):
+        if "Up" not in state and state[0] == "Squat":
             state.popleft()
-            state.append("UP")
-            reps += 1
-    elif ((LhipAngle > 170)  and (LkneeAngle > 160)):
-        if "UP" not in state and state[0] == "SQUAT":
-            state.popleft()
-            state.append("UP")
+            state.append("Up")
             reps += 1
 
-    elif ((RkneeAngle < 80) and (RhipAngle < 80)):
-        if "SQUAT" not in state and state[0] == "UP":
+    elif ((RkneeAngle < 80) and (RhipAngle < 80)) or ((LkneeAngle < 80) and (LhipAngle < 80)):
+        if "Squat" not in state and state[0] == "Up":
             state.popleft()
-            state.append("SQUAT")
-
-    elif((LkneeAngle < 80) and (LhipAngle < 80)):
-        if "SQUAT" not in state and state[0] == "UP":
-            state.popleft()
-            state.append("SQUAT")
+            state.append("Squat")
 
     else:
         if "UNKNOWN" not in state:
@@ -58,46 +47,53 @@ def squat(RhipAngle, RkneeAngle, LhipAngle, LkneeAngle, reps, state):
     return reps, state
 
 
-def benchpress(RelbowAngle, LelbowAngle, reps, status, side):
+def benchpress(RelbowAngle, LelbowAngle, reps, state):
     
-    if RelbowAngle < 100:
-        side = 1
-        status = "Down"
-    elif LelbowAngle < 100:
-        side = 2
-        status = "Down"
+    # print(reps, state, RelbowAngle, LelbowAngle)
+    if RelbowAngle > 170 or LelbowAngle > 170:
+        if "Up" not in state and state[0] == "Down":
+            state.popleft()
+            state.append("Up")
+            reps += 1
+
+    elif RelbowAngle < 95 or LelbowAngle < 95:
+        if "Down" not in state and state[0] == "Up":
+            state.popleft()
+            state.append("Down")
+
+    else:
+        if "UNKNOWN" not in state:
+            state.append("UNKNOWN")
+        elif state[0] == "UNKNOWN":
+            state.popleft()
+            state.append("UNKNOWN")
+
+    return reps, state
 
 
-    if RelbowAngle > 160 and status == 'Down' and side == 1:
-        status = "UP"
-        reps += 1
-    elif LelbowAngle > 160 and status == 'Down' and side == 2:
-        status = "UP"
-        reps += 1
+def deadlift(RhipAngle, RkneeAngle, LhipAngle, LkneeAngle, reps, state):
     
-    # print(elbowAngle)
-    return reps, status, side
+    # print(reps, state, LhipAngle, LkneeAngle)
 
+    if (RhipAngle < 60 and RkneeAngle < 150) or (LhipAngle < 60 and LkneeAngle < 150):
+        if "Down" not in state and state[0] == "Up":
+            state.popleft()
+            state.append("Down")
 
-def deadlift(RhipAngle, RkneeAngle, LhipAngle, LkneeAngle, reps, status, side):
-    
-    if (RhipAngle < 100 and RkneeAngle < 150):
-        side = 1
-        status = "Down"
-    elif (LhipAngle < 100 and LkneeAngle < 150):
-        side = 2
-        status = "Down"
+    elif (RhipAngle > 160 and RkneeAngle > 160) or (LhipAngle > 160 and LkneeAngle > 160):
+        if "Up" not in state and state[0] == "Down":
+            state.popleft()
+            state.append("Up")
+            reps += 1
 
+    else:
+        if "UNKNOWN" not in state:
+            state.append("UNKNOWN")
+        elif state[0] == "UNKNOWN":
+            state.popleft()
+            state.append("UNKNOWN")
 
-    if (RhipAngle > 170 and RkneeAngle > 170) and status == 'Down' and side == 1:
-        status = "UP"
-        reps += 1
-    elif (LhipAngle > 170 and LkneeAngle > 170) and status == 'Down' and side == 2:
-        status = "UP"
-        reps += 1
-    
-    # print(hipAngle, kneeAngle)
-    return reps, status, side
+    return reps, state
 
 def onerm(weight, reps):
     best = 0
@@ -131,5 +127,4 @@ def onerm(weight, reps):
 
 
 if __name__ == '__main__':
-    
-    print(int(2.9))
+    pass
