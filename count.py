@@ -20,30 +20,6 @@ def getAngle(top, mid, bottom):
     return angle
 
 
-def bete(RelbowAngle, LelbowAngle, reps, state):
-    
-    print(reps, state, RelbowAngle, LelbowAngle)
-
-    if RelbowAngle > 170 or LelbowAngle > 170:
-        if "Up" not in state and state[0] == "Down":
-            state.popleft()
-            state.append("Up")
-            reps += 1
-
-    elif RelbowAngle < 95 or LelbowAngle < 95:
-        if "Down" not in state and state[0] == "Up":
-            state.popleft()
-            state.append("Down")
-
-    else:
-        if "UNKNOWN" not in state:
-            state.append("UNKNOWN")
-        elif state[0] == "UNKNOWN":
-            state.popleft()
-            state.append("UNKNOWN")
-
-    return reps, state
-
 def benchpress(RelbowAngle, Re, LelbowAngle, Le, reps, state, data, result):
 
     # print(reps, state, RelbowAngle, LelbowAngle)
