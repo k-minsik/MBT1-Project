@@ -18,21 +18,26 @@ mp_pose = mp.solutions.pose
 reps_s = 0
 reps_b = 0
 reps_d = 0
-
+state = deque(["UP"])
+data = []
+result = []
 
 def gen_frames(event):
-    global reps_s, reps_b, reps_d
+    global reps_s, reps_b, reps_d, state, data, result
     state = deque(["Up"])
+    data = []
+    result = []
 
     if event == "Squat":
         reps_s = 0
-        camera = cv2.VideoCapture('./test_video/sqte.mp4')
+        # camera = cv2.VideoCapture('./test_video/squat.mp4')
+        camera = cv2.VideoCapture(0)
     elif event == "BenchPress":
         reps_b = 0
-        camera = cv2.VideoCapture('./test_video/bete.mp4')
+        camera = cv2.VideoCapture('./test_video/pushup.mp4')
     elif event == "Deadlift":
         reps_d
-        camera = cv2.VideoCapture('./test_video/dete.mp4')
+        camera = cv2.VideoCapture('./test_video/deadlift.mp4')
 
 
     with mp_pose.Pose(min_detection_confidence=0.5, min_tracking_confidence=0.5) as pose:
@@ -60,53 +65,86 @@ def gen_frames(event):
             elif event == "Deadlift":
                 cv2.putText(frame, str(reps_d), (int(width-width//4),int(height-height//9)), cv2.FONT_HERSHEY_SIMPLEX, 4, (0,0,0), 4, cv2.LINE_AA)
             
-            cv2.putText(frame, state, (0,int(height//10)), cv2.FONT_HERSHEY_SIMPLEX, 2, (255,255,255), 2, cv2.LINE_AA)
+            cv2.putText(frame, state[-1], (0,int(height//10)), cv2.FONT_HERSHEY_SIMPLEX, 2, (255,255,255), 2, cv2.LINE_AA)
 
             try:
                 landmarks = results.pose_landmarks.landmark
                 # print(landmarks)
                 mp_drawing.draw_landmarks(frame, results.pose_landmarks, mp_pose.POSE_CONNECTIONS, landmark_drawing_spec=mp_drawing_styles.get_default_pose_landmarks_style())
 
-                rightShoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
-                rightHip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
-                rightKnee = [landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y]
-                rightAnkle = [landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].y]
-                rightToe = [landmarks[mp_pose.PoseLandmark.RIGHT_FOOT_INDEX.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_FOOT_INDEX.value].y]
-                rightElbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
-                rightWrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
-                
-                leftShoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
-                leftHip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
-                leftKnee = [landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]
-                leftAnkle = [landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].x,landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].y]
-                leftToe = [landmarks[mp_pose.PoseLandmark.LEFT_FOOT_INDEX.value].x,landmarks[mp_pose.PoseLandmark.LEFT_FOOT_INDEX.value].y]
-                leftElbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
-                leftWrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
-                
-                RelbowAngle = count.getAngle(rightShoulder, rightElbow, rightWrist)
-                RkneeAngle = count.getAngle(rightHip, rightKnee, rightAnkle)
-                RhipAngle = count.getAngle(rightShoulder, rightHip, rightKnee)
-                # RankleAngle = count.getAngle(rightKnee, rightAnkle, rightToe)
 
-                LelbowAngle = count.getAngle(leftShoulder, leftElbow, leftWrist)
-                LkneeAngle = count.getAngle(leftHip, leftKnee, leftAnkle)
-                LhipAngle = count.getAngle(leftShoulder, leftHip, leftKnee)
-                # LankleAngle = count.getAngle(leftKnee, leftAnkle, leftToe)
+                if event == "Squat":
+                    rightShoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+                    rightHip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
+                    rightKnee = [landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y]
+                    rightAnkle = [landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].y]
+                    
+                    leftShoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+                    leftHip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
+                    leftKnee = [landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]
+                    leftAnkle = [landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].x,landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].y]
+
+                    RkneeAngle = count.getAngle(rightHip, rightKnee, rightAnkle)
+                    RhipAngle = count.getAngle(rightShoulder, rightHip, rightKnee)
+                    
+                    LkneeAngle = count.getAngle(leftHip, leftKnee, leftAnkle)
+                    LhipAngle = count.getAngle(leftShoulder, leftHip, leftKnee)
+
+                    Rh = landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].visibility
+                    Lh = landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].visibility
+
+                elif event == "Deadlift":
+                    rightShoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+                    rightHip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
+                    rightKnee = [landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_KNEE.value].y]
+                    rightAnkle = [landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_ANKLE.value].y]
+                    
+                    leftShoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+                    leftHip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
+                    leftKnee = [landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].x,landmarks[mp_pose.PoseLandmark.LEFT_KNEE.value].y]
+                    leftAnkle = [landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].x,landmarks[mp_pose.PoseLandmark.LEFT_ANKLE.value].y]
+
+                    RkneeAngle = count.getAngle(rightHip, rightKnee, rightAnkle)
+                    RhipAngle = count.getAngle(rightShoulder, rightHip, rightKnee)
+                    
+                    LkneeAngle = count.getAngle(leftHip, leftKnee, leftAnkle)
+                    LhipAngle = count.getAngle(leftShoulder, leftHip, leftKnee)
+
+                    Rh = landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].visibility
+                    Lh = landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].visibility
+    
+                elif event == "BenchPress":
+                    rightShoulder = [landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_SHOULDER.value].y]
+                    rightHip = [landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value].y]
+                    rightElbow = [landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].y]
+                    rightWrist = [landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].x,landmarks[mp_pose.PoseLandmark.RIGHT_WRIST.value].y]
+                    
+                    leftShoulder = [landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].x,landmarks[mp_pose.PoseLandmark.LEFT_SHOULDER.value].y]
+                    leftHip = [landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].x,landmarks[mp_pose.PoseLandmark.LEFT_HIP.value].y]
+                    leftElbow = [landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].x,landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].y]
+                    leftWrist = [landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].x,landmarks[mp_pose.PoseLandmark.LEFT_WRIST.value].y]
+
+                    RelbowAngle = count.getAngle(rightShoulder, rightElbow, rightWrist)
+                    LelbowAngle = count.getAngle(leftShoulder, leftElbow, leftWrist)
+
+                    Re = landmarks[mp_pose.PoseLandmark.RIGHT_ELBOW.value].visibility
+                    Le = landmarks[mp_pose.PoseLandmark.LEFT_ELBOW.value].visibility
+
 
                 if event == "Squat":
                     #Squat
-                    reps_s, state = count.squat(RhipAngle, RkneeAngle, LhipAngle, LkneeAngle, reps_s, state)
+                    reps_s, state, data, result = count.squat(RhipAngle, RkneeAngle, Rh, LhipAngle, LkneeAngle, Lh, reps_s, state, data, result)
                 elif event == "BenchPress":
                     #BenchPress
-                    reps_b, state= count.benchpress(RelbowAngle, LelbowAngle, reps_b, state)
+                    reps_b, state, data, result= count.benchpress(RelbowAngle, Re, LelbowAngle, Le, reps_b, state, data, result)
                 elif event == "Deadlift":
                     #DeadLift
-                    reps_d, state = count.deadlift(RhipAngle, RkneeAngle, LhipAngle, LkneeAngle, reps_d, state)
+                    reps_d, state, data, result = count.deadlift(RhipAngle, RkneeAngle, Rh, LhipAngle, LkneeAngle, Lh, reps_d, state, data, result)
                 
             except:
                 pass
 
-            resize_frame = cv2.resize(frame, (390, 480), interpolation=cv2.INTER_CUBIC)
+            resize_frame = cv2.resize(frame, (390, 460), interpolation=cv2.INTER_CUBIC)
             _, buffer = cv2.imencode('.jpg', resize_frame)
             frame = buffer.tobytes()
             yield (b'--frame\r\n'
@@ -149,12 +187,22 @@ def cnt_bench():
 def cnt_dead():
     return jsonify(data = reps_d)
 
-
 # Result Page
 @app.route('/result/<name>', methods=['POST'])
 def result(name):
     params = request.get_json()
-    sqldef.saveData(cursor, conn, params['event'], params['weight'], params['reps'], params['oneRM'], name)
+    sqldef.saveData(cursor, conn, params['event'], params['oneRM'], name)
+    f = open('test.csv', 'w')
+
+    for i in data:    
+        f.write(str(i).replace(' ', '')[1:-1] + '\n')
+    f.close()
+
+    f = open('result.csv', 'w')
+    for i in result:
+        f.write(str(i) + '\n')
+    f.close()
+    
     return params
 
 
@@ -203,7 +251,7 @@ def log_in():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8000)
+    app.run(host='localhost', port=8000)
 
     # total= sqldef.get_userData_t(cursor, conn, 'kms')
     # print(total)
