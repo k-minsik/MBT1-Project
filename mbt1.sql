@@ -126,3 +126,10 @@ values('Squat', '22-09-02', 300, 'kms');
 insert into Record
 values('BenchPress', '22-09-02', 400, 'kms');
 
+insert into Record 
+values('BenchPress', '22-10-21', 300, 'kms');
+select * from Record where UID = 'kms' and REvent = 'BenchPress';
+update Record 
+set R1rm = 700 where UID = 'kms' and REvent = 'BenchPress' and RDate = '22-10-21';
+
+select * from Record where UID = 'kms' and REvent = 'BenchPress';
