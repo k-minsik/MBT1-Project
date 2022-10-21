@@ -22,7 +22,7 @@ def getAngle(top, mid, bottom):
 
 def benchpress(RelbowAngle, Re, LelbowAngle, Le, reps, state, data, result):
 
-    # print(reps, state, RelbowAngle, LelbowAngle)
+    print(state, result)
 
     if Re > Le:
         if RelbowAngle > 160:
@@ -41,8 +41,6 @@ def benchpress(RelbowAngle, Re, LelbowAngle, Le, reps, state, data, result):
             if "Down" not in state or state[0] == "Down":
                 state.popleft()
                 state.append("Down")
-                if len(result) == reps:
-                    result.append(0)
             data.append([RelbowAngle])
 
         else:
@@ -51,6 +49,8 @@ def benchpress(RelbowAngle, Re, LelbowAngle, Le, reps, state, data, result):
             elif state[0] == "UNKNOWN":
                 state.popleft()
                 state.append("UNKNOWN")
+            if len(result) == reps:
+                result.append(0)
             data.append([RelbowAngle])
     
     else:
@@ -70,8 +70,6 @@ def benchpress(RelbowAngle, Re, LelbowAngle, Le, reps, state, data, result):
             if "Down" not in state or state[0] == "Down":
                 state.popleft()
                 state.append("Down")
-                if len(result) == reps:
-                    result.append(0)
             data.append([LelbowAngle])
 
         else:
@@ -80,6 +78,8 @@ def benchpress(RelbowAngle, Re, LelbowAngle, Le, reps, state, data, result):
             elif state[0] == "UNKNOWN":
                 state.popleft()
                 state.append("UNKNOWN")
+            if len(result) == reps:
+                result.append(0)
             data.append([LelbowAngle])
 
     return reps, state, data, result
@@ -89,8 +89,7 @@ def benchpress(RelbowAngle, Re, LelbowAngle, Le, reps, state, data, result):
 
 def squat(RhipAngle, RkneeAngle, Rh, LhipAngle, LkneeAngle, Lh, reps, state, data, result):
     
-    # print(state, RhipAngle, RkneeAngle, LhipAngle, LkneeAngle)
-    # print(RhipAngle, RkneeAngle, LhipAngle, LkneeAngle)
+    print(state, result)
     if Rh > Lh:
         if RhipAngle > 170 and RkneeAngle > 160:
             if "Up" not in state and state[0] == "Squat":
@@ -108,8 +107,6 @@ def squat(RhipAngle, RkneeAngle, Rh, LhipAngle, LkneeAngle, Lh, reps, state, dat
             if ("Squat" not in state) or (state[0] == "Squat"):
                 state.popleft()
                 state.append("Squat")
-                if len(result) == reps:
-                    result.append(0)
             data.append([RkneeAngle, RhipAngle])
 
         else:
@@ -118,7 +115,10 @@ def squat(RhipAngle, RkneeAngle, Rh, LhipAngle, LkneeAngle, Lh, reps, state, dat
             elif state[0] == "UNKNOWN":
                 state.popleft()
                 state.append("UNKNOWN")
+            if len(result) == reps:
+                result.append(0)
             data.append([RkneeAngle, RhipAngle])
+            
     
     else:
         if LhipAngle > 170 and LkneeAngle > 160:
@@ -137,8 +137,6 @@ def squat(RhipAngle, RkneeAngle, Rh, LhipAngle, LkneeAngle, Lh, reps, state, dat
             if ("Squat" not in state) or (state[0] == "Squat"):
                 state.popleft()
                 state.append("Squat")
-                if len(result) == reps:
-                    result.append(0)
             data.append([LkneeAngle, LhipAngle])
 
         else:
@@ -147,6 +145,8 @@ def squat(RhipAngle, RkneeAngle, Rh, LhipAngle, LkneeAngle, Lh, reps, state, dat
             elif state[0] == "UNKNOWN":
                 state.popleft()
                 state.append("UNKNOWN")
+            if len(result) == reps:
+                result.append(0)
             data.append([LkneeAngle, LhipAngle])
     
     # print(data)
@@ -155,13 +155,13 @@ def squat(RhipAngle, RkneeAngle, Rh, LhipAngle, LkneeAngle, Lh, reps, state, dat
 
 def deadlift(RhipAngle, RkneeAngle, Rh, LhipAngle, LkneeAngle, Lh, reps, state, data, result):
 
+    print(state, result)
+    
     if Rh > Lh:
         if RhipAngle < 60 and RkneeAngle < 150:
             if "Down" not in state or state[0] == "Down":
                 state.popleft()
                 state.append("Down")
-                if len(result) == reps:
-                    result.append(0)
             data.append([RkneeAngle, RhipAngle])
 
         elif RhipAngle > 160 and RkneeAngle > 160:
@@ -182,6 +182,8 @@ def deadlift(RhipAngle, RkneeAngle, Rh, LhipAngle, LkneeAngle, Lh, reps, state, 
             elif state[0] == "UNKNOWN":
                 state.popleft()
                 state.append("UNKNOWN")
+            if len(result) == reps:
+                result.append(0)
             data.append([RkneeAngle, RhipAngle])
     
     else:
@@ -190,8 +192,6 @@ def deadlift(RhipAngle, RkneeAngle, Rh, LhipAngle, LkneeAngle, Lh, reps, state, 
             if "Down" not in state or state[0] == "Down":
                 state.popleft()
                 state.append("Down")
-                if len(result) == reps:
-                    result.append(0)
             data.append([LkneeAngle, LhipAngle])
 
         elif LhipAngle > 160 and LkneeAngle > 160:
@@ -212,6 +212,8 @@ def deadlift(RhipAngle, RkneeAngle, Rh, LhipAngle, LkneeAngle, Lh, reps, state, 
             elif state[0] == "UNKNOWN":
                 state.popleft()
                 state.append("UNKNOWN")
+            if len(result) == reps:
+                result.append(0)
             data.append([LkneeAngle, LhipAngle])
 
     return reps, state, data, result
