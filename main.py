@@ -30,8 +30,8 @@ def gen_frames(event):
 
     if event == "Squat":
         reps_s = 0
-        # camera = cv2.VideoCapture('./test_video/squat.mp4')
-        camera = cv2.VideoCapture(0)
+        camera = cv2.VideoCapture('./test_video/squat.mp4')
+        # camera = cv2.VideoCapture(0)
     elif event == "BenchPress":
         reps_b = 0
         camera = cv2.VideoCapture('./test_video/pushup.mp4')
