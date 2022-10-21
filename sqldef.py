@@ -11,13 +11,13 @@ def sign_up(cur, con, uid, upw):
         sign_sql = "insert into User values('" + uid + "', '" + upw + "');"
         cur.execute(sign_sql)
 
-        init_sql_s = "insert into Record values('Squat', '" + datetime.date.today().strftime("%y-%m-%d") + "', 0, 0, 0, '" + uid + "', 1111);"
+        init_sql_s = "insert into Record values('Squat', '" + datetime.date.today().strftime("%y-%m-%d") + "', 0, '" + uid + "');"
         cur.execute(init_sql_s)
 
-        init_sql_b = "insert into Record values('BenchPress', '" + datetime.date.today().strftime("%y-%m-%d") + "', 0, 0, 0, '" + uid + "', 1111);"
+        init_sql_b = "insert into Record values('BenchPress', '" + datetime.date.today().strftime("%y-%m-%d") + "', 0, '" + uid + "');"
         cur.execute(init_sql_b)
 
-        init_sql_d = "insert into Record values('Deadlift', '" + datetime.date.today().strftime("%y-%m-%d") + "', 0, 0, 0, '" + uid + "', 1111);"
+        init_sql_d = "insert into Record values('Deadlift', '" + datetime.date.today().strftime("%y-%m-%d") + "', 0, '" + uid + "');"
         cur.execute(init_sql_d)
         con.commit()
         print(uid + ":" + upw + " 님 회원가입 성공")
@@ -48,18 +48,18 @@ def log_in(cur, con, uid, upw):
         return 0 # fail login
 
 
-def saveData(cur, con, event, weight, reps, oneRM, uid):
+def saveData(cur, con, event, oneRM, uid):
     try:
         try:
             # Insert Data
-            insert_sql = "insert into Record values('" + event + "', '" + datetime.date.today().strftime("%y-%m-%d") + "', " + str(weight) + ", " + str(reps) + ", " + str(oneRM) + ", '" + uid + "', 1111);"
+            insert_sql = "insert into Record values('" + event + "', '" + datetime.date.today().strftime("%y-%m-%d") + "', " + str(oneRM) + ", '" + uid + "');"
             cur.execute(insert_sql)
             con.commit()
             print(event + ": 새로운 데이터 생성")
 
         except:
             # Update Data
-            update_sql = "update Record set RWeight = " + str(weight) + ", Rreps = " + str(reps) + ", R1rm = " + str(oneRM) + " where UID = '" + uid + "' and REvent = '" + event + "' and RDate = '" + datetime.date.today().strftime("%y-%m-%d") + "';"
+            update_sql = "update Record set R1rm = " + str(oneRM) + " where UID = '" + uid + "' and REvent = '" + event + "' and RDate = '" + datetime.date.today().strftime("%y-%m-%d") + "';"
             cur.execute(update_sql)
             con.commit()
             print(event + ": 오늘 데이터 최신화")
@@ -71,7 +71,7 @@ def saveData(cur, con, event, weight, reps, oneRM, uid):
 
 def get_userData_s(cur, con, uid):
     try:
-        s_sql = "select RDate, RWeight from Record where UID = '" + uid + "' and REvent = 'Squat' order by RDate desc LIMIT 6;"
+        s_sql = "select RDate, R1rm from Record where UID = '" + uid + "' and REvent = 'Squat' order by RDate desc LIMIT 6;"
         cur.execute(s_sql)
         con.commit()
 
@@ -90,7 +90,7 @@ def get_userData_s(cur, con, uid):
 
 def get_userData_b(cur, con, uid):
     try:
-        b_sql = "select RDate, RWeight from Record where UID = '" + uid + "' and REvent = 'BenchPress' order by RDate desc LIMIT 6;"
+        b_sql = "select RDate, R1rm from Record where UID = '" + uid + "' and REvent = 'BenchPress' order by RDate desc LIMIT 6;"
         cur.execute(b_sql)
         con.commit()
 
@@ -108,7 +108,7 @@ def get_userData_b(cur, con, uid):
 
 def get_userData_d(cur, con, uid):
     try:
-        d_sql = "select RDate, RWeight from Record where UID = '" + uid + "' and REvent = 'Deadlift' order by RDate desc LIMIT 6;"
+        d_sql = "select RDate, R1rm from Record where UID = '" + uid + "' and REvent = 'Deadlift' order by RDate desc LIMIT 6;"
         cur.execute(d_sql)
         con.commit()
 
@@ -128,15 +128,15 @@ def get_userData_t(cur, con, uid):
     sleep(0.5) # get_userData_s/b/d 와 동시에 Table에 접근 방지
     try:
         oneRM = {}
-        cur.execute("select MAX(RWeight) from Record where REvent = 'Squat' and UID = '" + uid + "';")
+        cur.execute("select MAX(R1rm) from Record where REvent = 'Squat' and UID = '" + uid + "';")
         con.commit()
         best_s = cur.fetchone()
 
-        cur.execute("select MAX(RWeight) from Record where REvent = 'BenchPress' and UID = '" + uid + "';")
+        cur.execute("select MAX(R1rm) from Record where REvent = 'BenchPress' and UID = '" + uid + "';")
         con.commit()
         best_b = cur.fetchone()
 
-        cur.execute("select MAX(RWeight) from Record where REvent = 'Deadlift' and UID = '" + uid + "';")
+        cur.execute("select MAX(R1rm) from Record where REvent = 'Deadlift' and UID = '" + uid + "';")
         con.commit()
         best_d = cur.fetchone()
 
@@ -166,13 +166,13 @@ def rank_sys(cur, con):
         userID = cur.fetchall()
 
         for i in userID:
-            cur.execute("select MAX(RWeight) from Record where REvent = 'Squat' and UID = '" + i[0] + "';")
+            cur.execute("select MAX(R1rm) from Record where REvent = 'Squat' and UID = '" + i[0] + "';")
             best_s = cur.fetchall()
 
-            cur.execute("select MAX(RWeight) from Record where REvent = 'BenchPress' and UID = '" + i[0] + "';")
+            cur.execute("select MAX(R1rm) from Record where REvent = 'BenchPress' and UID = '" + i[0] + "';")
             best_b = cur.fetchall()
 
-            cur.execute("select MAX(RWeight) from Record where REvent = 'Deadlift' and UID = '" + i[0] + "';")
+            cur.execute("select MAX(R1rm) from Record where REvent = 'Deadlift' and UID = '" + i[0] + "';")
             best_d = cur.fetchall()
 
             best_rm = best_s[0][0] + best_b[0][0] + best_d[0][0]
