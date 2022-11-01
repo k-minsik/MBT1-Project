@@ -1,8 +1,12 @@
 import pymysql
 import datetime
 from time import sleep
+import config
 
-conn = pymysql.connect(host='localhost', user='root', password='', db='mbt1', charset='utf8mb4')
+conn = pymysql.connect(host=config.DATABASE_CONFIG['host'],
+                        user=config.DATABASE_CONFIG['user'], 
+                        password=config.DATABASE_CONFIG['password'], 
+                        db=config.DATABASE_CONFIG['dbname'], charset='utf8mb4')
 cursor = conn.cursor()
 
 def sign_up(cur, con, uid, upw):
